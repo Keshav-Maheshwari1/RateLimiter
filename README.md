@@ -32,52 +32,50 @@ Implementation Details
 
 Add the following dependency to your pom.xml to use Bucket4J:
 
-<dependency>
-    
+    <dependency>
     <groupId>com.bucket4j</groupId>
     <artifactId>bucket4j-core</artifactId>
     <version>8.10.1</version>
-    
-</dependency>
+    </dependency>
 
 2. Configuration Class: RateLimitConfig
 
 Defines the rate-limiting rules (e.g., 5 requests per minute).
 
-@Configuration
-public class RateLimitConfig {
-
-    @Bean
-    public Bucket bucket() {
-        Bandwidth limit = Bandwidth.builder()
-                                   .capacity(5)
-                                   .refillGreedy(5, Duration.ofMinutes(1))
-                                   .build();
-        return Bucket.builder()
-                     .addLimit(limit)
-                     .build();
+    @Configuration
+    public class RateLimitConfig {
+    
+        @Bean
+        public Bucket bucket() {
+            Bandwidth limit = Bandwidth.builder()
+                                       .capacity(5)
+                                       .refillGreedy(5, Duration.ofMinutes(1))
+                                       .build();
+            return Bucket.builder()
+                         .addLimit(limit)
+                         .build();
+        }
     }
-}
 
 3. Filter Class: RateLimitingFilter
 
 This class intercepts incoming requests and applies rate-limiting logic.
 
-@Component
-public class RateLimitingFilter implements Filter {
-
-    @Autowired
-    private Bucket bucket;
-
-    @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        if (bucket.tryConsume(1)) {
-            filterChain.doFilter(servletRequest, servletResponse);
-        } else {
-            ((HttpServletResponse) servletResponse).setStatus(429); // Too Many Requests
+    @Component
+    public class RateLimitingFilter implements Filter {
+    
+        @Autowired
+        private Bucket bucket;
+    
+        @Override
+        public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+            if (bucket.tryConsume(1)) {
+                filterChain.doFilter(servletRequest, servletResponse);
+            } else {
+                ((HttpServletResponse) servletResponse).setStatus(429); // Too Many Requests
+            }
         }
     }
-}
 
 
 How It Works

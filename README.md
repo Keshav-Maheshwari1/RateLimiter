@@ -33,9 +33,11 @@ Implementation Details
 Add the following dependency to your pom.xml to use Bucket4J:
 
 <dependency>
+    
     <groupId>com.bucket4j</groupId>
     <artifactId>bucket4j-core</artifactId>
     <version>8.10.1</version>
+    
 </dependency>
 
 2. Configuration Class: RateLimitConfig
